@@ -6,8 +6,8 @@ APRIORI ALGORITHM"""
 
 import os
 import csv
-from collections import Counter
 import sys
+from collections import Counter
 from collections import defaultdict
 from operator import itemgetter
 
@@ -16,7 +16,6 @@ class Apriori(object):
 	"""docstring for Apriori"""
 	def __init__(self,data_path):
 		self.data_path = data_path
-
 
 	def data_filter(self):
 		with open (self.data_path, newline='') as csvfile:
@@ -77,10 +76,10 @@ class Apriori(object):
 
 	def find_freq_itemsets(self,ip_itemsets,k_1_itemsets,min_support):
 		counts = defaultdict(int)
-		for ips, contents in ip_itemsets.items():							# loop through the ip_itemsets
-			for itemset in k_1_itemsets:									# loop through the k-1 frequent itemsets
-				if itemset.issubset(contents):								# if itemset is a subset of the frequent set
-					for other_item in contents - itemset:					# loop through the rest of the items
+		for ips, contents in ip_itemsets.items():		# loop through the ip_itemsets
+			for itemset in k_1_itemsets:		# loop through the k-1 frequent itemsets
+				if itemset.issubset(contents):		# if itemset is a subset of the frequent set
+					for other_item in contents - itemset:		# loop through the rest of the items
 						curr_superset = itemset | frozenset((other_item,))
 						counts[curr_superset] +=1
 		k_itemsets = dict()
@@ -100,7 +99,6 @@ class Apriori(object):
 		return candidate_rules
 
 	def calculate_confidence(self,ip_itemsets,candidate_rules,**kwargs):
-
 		correct_counts = defaultdict(int)
 		incorrect_counts = defaultdict(int)
 		for ips, content in ip_itemsets.items():
@@ -115,16 +113,15 @@ class Apriori(object):
 		rule_confidence = dict()
 		for candidate_rule in candidate_rules:
 			try:
-				percentage = correct_counts[candidate_rule]/(correct_counts[candidate_rule]+incorrect_counts[candidate_rule])
+				percentage = correct_counts[candidate_rule]
+				/(correct_counts[candidate_rule]
+				+incorrect_counts[candidate_rule])
 			except ZeroDivisionError:
 				percentage = 0
 			rule_confidence[candidate_rule] = percentage
-		"""rule_confidence = {candidate_rule: correct_counts[candidate_rule]
-																/float(correct_counts[candidate_rule]
-																+incorrect_counts[candidate_rule])
-																for candidate_rule in candidate_rules}"""
-		test = kwargs.get('test')
-		if test is not True:
+
+		test = kwargs.get('test',False)
+		if test is False:
 			min_confidence = 0.9
 			if kwargs.get('min_confidence') is not None:
 				min_confidence = kwargs.get('min_confidence')
@@ -137,6 +134,7 @@ class Apriori(object):
 		premise_name = ", ".join(self.look_up_dict.get(n) for n in premise)
 		conclusion_name = self.look_up_dict.get(conclusion)
 		return premise_name,conclusion_name
+
 if __name__ == '__main__':
 
 	"""INITIAL SETUP"""
@@ -158,8 +156,8 @@ if __name__ == '__main__':
 	freq_itemsets = dict()
 	#initial frequent itemset
 	freq_itemsets[1] = dict((frozenset((idx,)),content[1])
-							for idx,content in enumerate(contents)
-							if content[1] > min_support)
+						for idx,content in enumerate(contents)
+						if content[1] > min_support)
 	
 	for k in range(2,20):
 		curr_freq_set = AA.find_freq_itemsets(ip_itemsets,freq_itemsets[k-1],min_support)
